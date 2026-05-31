@@ -1,0 +1,10 @@
+# 本地编译产物
+/go-note
+*.exe
+*.test
+*.out
+
+# 编辑器
+.DS_Store
+.idea/
+.vscode/
