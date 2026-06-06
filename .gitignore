@@ -6,6 +6,9 @@
 
 # Node
 node_modules/
+package-lock.json
+dist/
+*.tsbuildinfo
 
 # 编辑器
 .DS_Store

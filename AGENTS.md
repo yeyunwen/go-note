@@ -13,7 +13,7 @@
    - Go：`04-interfaces/main.go`
    - Node：`04-interfaces/nodejs/main.ts`
 3. **语言选择**：优先 **TypeScript**（便于与 NestJS 概念对照）；若该课刻意展示纯 JS 特性，可用 `.mjs` / `.js`，并在文件头注释说明原因。
-4. **可运行**：Node 侧应能直接运行或附带最短运行说明（如在章节目录 `README.md` 或 `nodejs/package.json` 中写 `node main.mjs` / `npx tsx main.ts`）。
+4. **可运行**：Node 侧应能直接运行或附带最短运行说明（如在章节目录 `README.md` 或根目录 `package.json` 中写 `pnpm run <课号>` / `pnpm exec tsx ...`）。
 5. **简要对照**：Node 文件顶部用 1～3 行注释标出与 Go 的对应关系（如「`interface Storer` ≈ Nest Injectable 契约」）；避免冗长教程式注释。
 6. **同步修改**：只改 Go 而不更新 Node 对照视为未完成；删课或重命名时，同步处理 `nodejs/` 侧文件。
 

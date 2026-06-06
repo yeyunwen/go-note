@@ -2,7 +2,9 @@
   "name": "go-note-nodejs",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.12.1",
   "scripts": {
+    "web": "pnpm --dir web dev",
     "00": "tsx 00-basics/nodejs/main.ts",
     "01": "tsx 01-http/nodejs/main.ts",
     "02": "tsx 02-structs-json/nodejs/main.ts",

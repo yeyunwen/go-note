@@ -1,0 +1,18 @@
+{
+  "name": "go-note-web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "tsx scripts/sync-lessons.ts",
+    "predev": "pnpm sync",
+    "dev": "concurrently -n site,exec -c blue,green \"pnpm --filter @go-note/site dev\" \"pnpm --filter @go-note/executor dev\"",
+    "prebuild": "pnpm sync",
+    "build": "pnpm --filter @go-note/site build",
+    "start": "pnpm --filter @go-note/executor start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

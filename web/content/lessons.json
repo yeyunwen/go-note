@@ -1,0 +1,195 @@
+{
+  "lessons": [
+    {
+      "id": "00-basics",
+      "title": "包与导出函数",
+      "status": "ready",
+      "runMode": "stdout",
+      "nestHint": "模块导出：Go 首字母大写 = 包外可见；TS 用 export",
+      "go": {
+        "entry": "main.go",
+        "files": {
+          "main.go": "package main\n\nimport \"go-note/00-basics/hello\"\n\nfunc main() {\n\thello.Hello()\n}\n",
+          "hello/hello.go": "package hello\n\nimport \"fmt\"\n\nfunc Hello() {\n\tfmt.Println(\"Hello, World!\")\n}\n"
+        }
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {
+          "nodejs/main.ts": "// Go: 00-basics/main.go — 从子包导入并调用导出函数\n\nimport { hello } from './hello/hello.js';\n\nhello();\n",
+          "nodejs/hello/hello.ts": "// Go: package hello + 导出函数 Hello（首字母大写 = 包外可见）\n\nexport function hello(): void {\n  console.log('Hello, World!');\n}\n"
+        }
+      }
+    },
+    {
+      "id": "01-http",
+      "title": "标准库 HTTP、ServeMux",
+      "status": "ready",
+      "runMode": "server-demo",
+      "nestHint": "Controller + 路由：Go ServeMux ≈ Express/Nest 路由注册",
+      "go": {
+        "entry": "main.go",
+        "files": {
+          "main.go": "package main\n\nimport (\n\t\"log\"\n\t\"net/http\"\n)\n\nfunc main() {\n\tmux := http.NewServeMux()\n\n\tmux.HandleFunc(\"/\", func(w http.ResponseWriter, r *http.Request) {\n\t\tw.Header().Set(\"Content-Type\", \"text/plain; charset=utf-8\")\n\t\t_, _ = w.Write([]byte(\"Hello from Go local server!\\n\"))\n\t})\n\n\tmux.HandleFunc(\"/healthz\", func(w http.ResponseWriter, r *http.Request) {\n\t\tw.WriteHeader(http.StatusOK)\n\t\t_, _ = w.Write([]byte(\"ok\"))\n\t})\n\n\taddr := \":8080\"\n\tlog.Printf(\"server running at http://localhost%s\\n\", addr)\n\tif err := http.ListenAndServe(addr, mux); err != nil {\n\t\tlog.Fatalf(\"server stopped: %v\", err)\n\t}\n}\n"
+        },
+        "demo": {
+          "entry": "main.go",
+          "files": {
+            "main.go": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\n// 网站演示版：用 httptest 模拟请求，无需启动长跑服务器\nfunc main() {\n\tmux := http.NewServeMux()\n\n\tmux.HandleFunc(\"/\", func(w http.ResponseWriter, r *http.Request) {\n\t\tw.Header().Set(\"Content-Type\", \"text/plain; charset=utf-8\")\n\t\t_, _ = w.Write([]byte(\"Hello from Go local server!\\n\"))\n\t})\n\n\tmux.HandleFunc(\"/healthz\", func(w http.ResponseWriter, r *http.Request) {\n\t\tw.WriteHeader(http.StatusOK)\n\t\t_, _ = w.Write([]byte(\"ok\"))\n\t})\n\n\tfor _, path := range []string{\"/\", \"/healthz\"} {\n\t\treq := httptest.NewRequest(http.MethodGet, path, nil)\n\t\trec := httptest.NewRecorder()\n\t\tmux.ServeHTTP(rec, req)\n\t\tfmt.Printf(\"GET %s -> %d %q\\n\", path, rec.Code, rec.Body.String())\n\t}\n}\n"
+          }
+        }
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {
+          "nodejs/main.ts": "// Go: net/http + ServeMux；Node 用内置 http 模块\n\nimport { createServer, type IncomingMessage, type ServerResponse } from 'node:http';\n\nconst routes: Record<string, (res: ServerResponse) => void> = {\n  '/': (res) => {\n    res.setHeader('Content-Type', 'text/plain; charset=utf-8');\n    res.end('Hello from Node local server!\\n');\n  },\n  '/healthz': (res) => {\n    res.statusCode = 200;\n    res.end('ok');\n  },\n};\n\nconst server = createServer((req: IncomingMessage, res: ServerResponse) => {\n  const handler = routes[req.url ?? ''];\n  if (handler) {\n    handler(res);\n    return;\n  }\n  res.statusCode = 404;\n  res.end('not found');\n});\n\nconst port = 8080;\nserver.listen(port, () => {\n  console.log(`server running at http://localhost:${port}`);\n});\n"
+        },
+        "demo": {
+          "entry": "main.ts",
+          "files": {
+            "main.ts": "// 网站演示版：内存 mock 请求，无需 listen 长跑服务器\nimport { type IncomingMessage, type ServerResponse } from 'node:http';\n\nconst routes: Record<string, (res: MockResponse) => void> = {\n  '/': (res) => {\n    res.setHeader('Content-Type', 'text/plain; charset=utf-8');\n    res.end('Hello from Node local server!\\n');\n  },\n  '/healthz': (res) => {\n    res.statusCode = 200;\n    res.end('ok');\n  },\n};\n\nclass MockResponse {\n  statusCode = 200;\n  headers: Record<string, string> = {};\n  body = '';\n\n  setHeader(key: string, value: string): void {\n    this.headers[key] = value;\n  }\n\n  end(chunk?: string): void {\n    if (chunk !== undefined) {\n      this.body = chunk;\n    }\n  }\n}\n\nfunction handleRequest(req: IncomingMessage, res: ServerResponse): void {\n  const handler = routes[req.url ?? ''];\n  if (handler) {\n    handler(res as unknown as MockResponse);\n    return;\n  }\n  res.statusCode = 404;\n  res.end('not found');\n}\n\nfunction mockGet(path: string): void {\n  const res = new MockResponse();\n  handleRequest({ url: path } as IncomingMessage, res as unknown as ServerResponse);\n  console.log(`GET ${path} -> ${res.statusCode} ${JSON.stringify(res.body)}`);\n}\n\nfor (const path of ['/', '/healthz']) {\n  mockGet(path);\n}\n"
+          }
+        }
+      }
+    },
+    {
+      "id": "02-structs-json",
+      "title": "struct、json tag、序列化",
+      "status": "ready",
+      "runMode": "stdout",
+      "nestHint": "DTO：struct + `json:\"...\"` ≈ class/interface + 序列化字段名",
+      "go": {
+        "entry": "main.go",
+        "files": {
+          "main.go": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"log\"\n)\n\n// Note 类似 NestJS 里的 DTO；字段 tag 控制 JSON 名，类似 class-validator + @Expose\ntype Note struct {\n\tID    int    `json:\"id\"`\n\tTitle string `json:\"title\"`\n\tBody  string `json:\"body,omitempty\"` // 空字符串时省略\n}\n\nfunc main() {\n\tn := Note{ID: 1, Title: \"学 Go\", Body: \"从 struct 和 json 开始\"}\n\n\tb, err := json.Marshal(n)\n\tif err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tfmt.Println(\"Marshal:\", string(b))\n\n\tvar decoded Note\n\tif err := json.Unmarshal(b, &decoded); err != nil {\n\t\tlog.Fatal(err)\n\t}\n\tfmt.Printf(\"Unmarshal: %v\\n\", decoded)\n\t// 打印地址\n\tfmt.Printf(\"Unmarshal: %p\\n\", &decoded)\n\t// 打印类型\n\tfmt.Printf(\"Unmarshal: %T\\n\", decoded)\n}\n"
+        }
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {
+          "nodejs/main.ts": "// Go: struct + json tag；TS 用 interface/class + JSON.stringify/parse\n\ninterface Note {\n  id: number;\n  title: string;\n  body?: string; // 对应 json:\"body,omitempty\"：空字符串时不序列化\n}\n\nfunction marshalNote(n: Note): string {\n  const payload: Note = { id: n.id, title: n.title };\n  if (n.body) {\n    payload.body = n.body;\n  }\n  return JSON.stringify(payload);\n}\n\nfunction main(): void {\n  const n: Note = { id: 1, title: '学 Go', body: '从 struct 和 json 开始' };\n\n  const json = marshalNote(n);\n  console.log('Marshal:', json);\n\n  const decoded = JSON.parse(json) as Note;\n  console.log('Unmarshal:', decoded);\n  // JS 无 %p 内存地址；对象为引用类型，打印类型名近似 Go 的 %T\n  console.log('Unmarshal: [对象为引用，无 %p 等价]');\n  console.log('Unmarshal:', decoded.constructor.name === 'Object' ? 'Note' : decoded.constructor.name);\n}\n\nmain();\n"
+        }
+      }
+    },
+    {
+      "id": "03-pointers",
+      "title": "指针、传参",
+      "status": "ready",
+      "runMode": "stdout",
+      "nestHint": "引用语义：Go 指针传参；TS 用对象引用模拟可变状态",
+      "go": {
+        "entry": "main.go",
+        "files": {
+          "main.go": "package main\n\nimport \"go-note/03-pointers/demo\"\n\nfunc main() {\n\tdemo.Run()\n}\n",
+          "demo/pointer.go": "package demo\n\nimport \"fmt\"\n\nfunc increase(a *int) {\n\t*a++\n\tfmt.Println(\"increase: 值=\", *a, \"地址=\", a)\n}\n\nfunc Run() {\n\ta := 1\n\tfmt.Println(\"before: 值=\", a, \"地址=\", &a)\n\tincrease(&a)\n\tfmt.Println(\"after:  值=\", a, \"地址=\", &a)\n}\n"
+        }
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {
+          "nodejs/main.ts": "// Go: 03-pointers/main.go — 从 demo 子包调用\n\nimport { run } from './demo/pointer.js';\n\nrun();\n",
+          "nodejs/demo/pointer.ts": "// Go: *int 指针传参；JS 无指针，用「可变引用对象」模拟同一实例被修改\n\ntype IntRef = { value: number };\n\nfunction increase(a: IntRef): void {\n  a.value++;\n  console.log('increase: 值=', a.value, '引用对象=', a);\n}\n\nexport function run(): void {\n  const a: IntRef = { value: 1 };\n  console.log('before: 值=', a.value, '引用对象=', a);\n  increase(a);\n  console.log('after:  值=', a.value, '引用对象=', a);\n}\n"
+        }
+      }
+    },
+    {
+      "id": "04-interfaces",
+      "title": "interface、多态",
+      "status": "ready",
+      "runMode": "stdout",
+      "nestHint": "契约：Go 隐式实现 interface ≈ TS interface + class",
+      "go": {
+        "entry": "main.go",
+        "files": {
+          "main.go": "package main\n\nimport \"fmt\"\n\n// NestJS 里类似：定义接口类型，不同 Service 实现同一契约\n\ntype Storer interface {\n\tSave(title string) error\n}\n\ntype MemoryStore struct {\n\tnotes []string\n}\n\nfunc (m *MemoryStore) Save(title string) error {\n\tm.notes = append(m.notes, title)\n\treturn nil\n}\n\nfunc (m *MemoryStore) List() []string {\n\treturn m.notes\n}\n\n// FileStore 故意不实现 List，只实现 Storer 也能赋给 interface\n\ntype FileStore struct{}\n\nfunc (f *FileStore) Save(title string) error {\n\tfmt.Println(\"[file] save:\", title)\n\treturn nil\n}\n\nfunc createNote(s Storer, title string) error {\n\treturn s.Save(title)\n}\n\nfunc main() {\n\tmem := &MemoryStore{}\n\t_ = createNote(mem, \"第一条\")\n\t_ = createNote(mem, \"第二条\")\n\tfmt.Println(\"memory:\", mem.List())\n\n\tfile := &FileStore{}\n\t_ = createNote(file, \"写入文件（示例打印）\")\n\n\t// 类型断言：只有确定具体类型时才用\n\tif m, ok := interface{}(mem).(*MemoryStore); ok {\n\t\tfmt.Println(\"断言成功，条数:\", len(m.List()))\n\t}\n}\n"
+        }
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {
+          "nodejs/main.ts": "// Go: interface 隐式实现 + 类型断言；TS 用 interface + class + instanceof\n\ninterface Storer {\n  save(title: string): void;\n}\n\nclass MemoryStore implements Storer {\n  private notes: string[] = [];\n\n  save(title: string): void {\n    this.notes.push(title);\n  }\n\n  list(): string[] {\n    return this.notes;\n  }\n}\n\n// 只实现 Storer，不实现 list — 与 Go FileStore 一致\nclass FileStore implements Storer {\n  save(title: string): void {\n    console.log('[file] save:', title);\n  }\n}\n\nfunction createNote(s: Storer, title: string): void {\n  s.save(title);\n}\n\nfunction main(): void {\n  const mem = new MemoryStore();\n  createNote(mem, '第一条');\n  createNote(mem, '第二条');\n  console.log('memory:', mem.list());\n\n  const file = new FileStore();\n  createNote(file, '写入文件（示例打印）');\n\n  // 类型收窄：对应 Go 的 m, ok := x.(*MemoryStore)\n  if (mem instanceof MemoryStore) {\n    console.log('断言成功，条数:', mem.list().length);\n  }\n}\n\nmain();\n"
+        }
+      }
+    },
+    {
+      "id": "05-concurrency",
+      "title": "goroutine、channel",
+      "status": "todo",
+      "runMode": "coming-soon",
+      "nestHint": "并发：goroutine/channel ≈ Promise、async、EventEmitter",
+      "todoDescription": "待练习：goroutine、sync.WaitGroup、channel、context.Context 取消。建议题目：并发请求 3 个 URL，收集最先返回的两个结果（context 超时 2s）。",
+      "go": {
+        "entry": "main.go",
+        "files": {}
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {}
+      }
+    },
+    {
+      "id": "06-cli",
+      "title": "flag / 小 CLI",
+      "status": "todo",
+      "runMode": "coming-soon",
+      "nestHint": "命令行参数：flag 包 ≈ process.argv / commander",
+      "todoDescription": "待练习：用 flag 解析子命令与参数，实现一个小 CLI 工具。",
+      "go": {
+        "entry": "main.go",
+        "files": {}
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {}
+      }
+    },
+    {
+      "id": "07-db",
+      "title": "database/sql 或 pgx",
+      "status": "todo",
+      "runMode": "coming-soon",
+      "nestHint": "数据访问：database/sql ≈ TypeORM / Prisma 底层驱动",
+      "todoDescription": "待练习：连接数据库，完成 CRUD 与简单查询。",
+      "go": {
+        "entry": "main.go",
+        "files": {}
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {}
+      }
+    },
+    {
+      "id": "08-test",
+      "title": "table-driven test",
+      "status": "todo",
+      "runMode": "coming-soon",
+      "nestHint": "测试：table-driven test ≈ Jest 参数化用例",
+      "todoDescription": "待练习：为已有函数编写 table-driven 单元测试。",
+      "go": {
+        "entry": "main.go",
+        "files": {}
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {}
+      }
+    },
+    {
+      "id": "mini",
+      "title": "小项目归档",
+      "status": "todo",
+      "runMode": "coming-soon",
+      "nestHint": "综合练习：短链、URL 监控、小 CLI 等完整小项目",
+      "todoDescription": "稍完整、可封存的小项目。学完再从零建子目录，不必和学习练习混在一起。",
+      "go": {
+        "entry": "main.go",
+        "files": {}
+      },
+      "node": {
+        "entry": "nodejs/main.ts",
+        "files": {}
+      }
+    }
+  ]
+}
