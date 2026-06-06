@@ -26,5 +26,9 @@ func main() {
 	if err := json.Unmarshal(b, &decoded); err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Unmarshal: %+v\n", decoded)
+	fmt.Printf("Unmarshal: %v\n", decoded)
+	// 打印地址
+	fmt.Printf("Unmarshal: %p\n", &decoded)
+	// 打印类型
+	fmt.Printf("Unmarshal: %T\n", decoded)
 }

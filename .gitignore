@@ -4,6 +4,9 @@
 *.test
 *.out
 
+# Node
+node_modules/
+
 # 编辑器
 .DS_Store
 .idea/

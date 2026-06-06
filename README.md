@@ -5,17 +5,19 @@ Go 学习练习仓库（不是某个产品项目）。按主题分目录，每�
 ## 环境
 
 - Go 1.24+（见 `go.mod`）
-- 运行某一课：`go run ./01-http`
+- Node.js 18+（对照示例，见各章 `nodejs/`）
+- 运行某一课（Go）：`go run ./01-http`
+- 运行某一课（Node）：`npm install` 后 `npm run 01`（或 `npx tsx 01-http/nodejs/main.ts`）
 
 ## 目录
 
-| 目录 | 内容 | 运行 |
-|------|------|------|
-| `00-basics/hello` | 包与导出函数 | `go run ./00-basics` |
-| `01-http` | 标准库 HTTP、`ServeMux` | `go run ./01-http` |
-| `02-structs-json` | struct、json tag、序列化 | `go run ./02-structs-json` |
-| `03-pointers` | 指针、传参 | `go run ./03-pointers` |
-| `04-interfaces` | interface、多态 | `go run ./04-interfaces` |
+| 目录 | 内容 | Go | Node |
+|------|------|-----|------|
+| `00-basics/hello` | 包与导出函数 | `go run ./00-basics` | `npm run 00` |
+| `01-http` | 标准库 HTTP、`ServeMux` | `go run ./01-http` | `npm run 01` |
+| `02-structs-json` | struct、json tag、序列化 | `go run ./02-structs-json` | `npm run 02` |
+| `03-pointers` | 指针、传参 | `go run ./03-pointers` | `npm run 03` |
+| `04-interfaces` | interface、多态 | `go run ./04-interfaces` | `npm run 04` |
 | `05-concurrency` | goroutine、channel（待写） | — |
 | `06-cli` | flag / 小 CLI（待写） | — |
 | `07-db` | database/sql 或 pgx（待写） | — |
