@@ -78,12 +78,12 @@ export const curriculum: LessonMeta[] = [
   {
     id: '06-cli',
     title: 'flag / 小 CLI',
-    status: 'todo',
-    runMode: 'coming-soon',
-    nestHint: '命令行参数：flag 包 ≈ process.argv / commander',
+    status: 'ready',
+    runMode: 'stdout',
+    nestHint: '命令行参数：flag 包 ≈ process.argv；小工具：查 GitHub 首次 commit',
     goEntry: 'main.go',
     nodeEntry: 'nodejs/main.ts',
-    todoDescription: '待练习：用 flag 解析子命令与参数，实现一个小 CLI 工具。',
+    extraGoFiles: ['github.go', 'token.go'],
   },
   {
     id: '07-db',

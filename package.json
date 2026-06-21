@@ -9,7 +9,8 @@
     "01": "tsx 01-http/nodejs/main.ts",
     "02": "tsx 02-structs-json/nodejs/main.ts",
     "03": "tsx 03-pointers/nodejs/main.ts",
-    "04": "tsx 04-interfaces/nodejs/main.ts"
+    "04": "tsx 04-interfaces/nodejs/main.ts",
+    "06": "tsx 06-cli/nodejs/main.ts"
   },
   "devDependencies": {
     "@types/node": "^25.9.2",
