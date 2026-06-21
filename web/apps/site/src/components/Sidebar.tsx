@@ -45,7 +45,7 @@ export function Sidebar({ lessons }: SidebarProps) {
           <span className="inline-block h-2 w-2 rounded-full bg-node" />
           <span>Node</span>
         </div>
-        <p className="mt-1 text-xs text-slate-500">本地执行 · 仅受信环境</p>
+        <p className="mt-1 text-xs text-slate-500">浏览代码 · 本地可运行</p>
       </div>
     </aside>
   );

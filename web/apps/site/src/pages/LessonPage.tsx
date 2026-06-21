@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchHealth, runGo, runNode } from '../api.ts';
+import { isStaticDeploy } from '../env.ts';
 import { DualEditor, getInitialCode, type CodeVariant } from '../components/DualEditor.tsx';
 import { GoLogo } from '../components/logos/GoLogo.tsx';
 import { NodeLogo } from '../components/logos/NodeLogo.tsx';
@@ -39,8 +40,9 @@ export function LessonPage({ lessons }: LessonPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [health, setHealth] = useState<HealthResponse | null>(null);
 
-  const runnable = lesson?.runMode !== 'coming-soon';
-  const readOnly = !runnable;
+  const isComingSoon = lesson?.runMode === 'coming-soon';
+  const runnable = !isComingSoon && !isStaticDeploy;
+  const readOnly = isComingSoon;
 
   const resetCodes = useCallback(() => {
     if (!lesson) return;

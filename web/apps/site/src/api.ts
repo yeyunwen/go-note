@@ -1,6 +1,10 @@
+import { isStaticDeploy } from './env.ts';
 import type { HealthResponse, RunResult } from './types.ts';
 
 export async function fetchHealth(): Promise<HealthResponse> {
+  if (isStaticDeploy) {
+    throw new Error('static deploy');
+  }
   const res = await fetch('/api/health');
   if (!res.ok) {
     throw new Error('executor 不可用，请确认已运行 pnpm dev');
