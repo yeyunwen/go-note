@@ -13,6 +13,18 @@ Go 学习练习仓库（不是某个产品项目）。按主题分目录，每�
 
 仓库内 `web/` 提供 Go / Node 双栏对照浏览与**本地在线运行**（需本机已安装 Go 与 Node）。
 
+### 在线预览（GitHub Pages）
+
+推送 `main` 分支后，GitHub Actions 自动部署静态站点：
+
+**https://yeyunwen.github.io/go-note/**
+
+GitHub Pages 为静态预览（浏览/编辑代码）；「运行 Go / Node」需在本地启动完整环境。
+
+首次使用请在仓库 **Settings → Pages → Build and deployment** 中将 Source 设为 **GitHub Actions**。
+
+### 本地开发（含代码执行）
+
 ```bash
 # 在仓库根目录（pnpm workspace 一次安装全部依赖）
 pnpm install
@@ -22,11 +34,12 @@ pnpm run web
 
 浏览器打开 Vite 提示的地址（默认 `http://localhost:5173`）。站点通过 `executor`（`:3001`）在临时目录执行代码，超时 5s。
 
-| 能力 | 说明 |
-|------|------|
-| `00`–`04` | 可在线运行，编辑后点「运行 Go / Node」 |
-| `01-http` | **在线演示版**（httptest / mock 请求）；完整 `ListenAndServe` 版只读，本地 `go run ./01-http` |
-| `05`–`08`、`mini` | 仅占位与待写说明，不可运行 |
+| 能力 | GitHub Pages | 本地 `pnpm run web` |
+|------|----------------|---------------------|
+| 浏览 / 编辑代码 | 支持 | 支持 |
+| 运行 Go / Node | 不支持 | 支持（`00`–`04`） |
+| `01-http` 演示版 | 仅浏览 | 可运行 |
+| `05`–`08`、`mini` | 占位说明 | 占位说明 |
 
 课程内容在构建时由 `web/scripts/sync-lessons.ts` 从各章目录同步，无需维护第二份源码。修改章节目录后重新 `pnpm dev` 或 `pnpm sync`（在 `web/` 目录）即可更新网站。
 
@@ -40,7 +53,7 @@ pnpm run web
 | `03-pointers` | 指针、传参 | `go run ./03-pointers` | `pnpm run 03` |
 | `04-interfaces` | interface、多态 | `go run ./04-interfaces` | `pnpm run 04` |
 | `05-concurrency` | goroutine、channel（待写） | — |
-| `06-cli` | flag / 小 CLI（待写） | — |
+| `06-cli` | flag / 小 CLI（查 GitHub 首次 commit） | `go run ./06-cli` | `pnpm run 06` |
 | `07-db` | database/sql 或 pgx（待写） | — |
 | `08-test` | table-driven test（待写） | — |
 | `mini/` | 稍完整的小项目归档（可选） | — |
@@ -63,4 +76,5 @@ pnpm run web
 - [x] `03-pointers`
 - [x] `04-interfaces`
 - [ ] `05-concurrency`
+- [x] `06-cli` — first-commit CLI
 - [ ] `mini/` 小项目
